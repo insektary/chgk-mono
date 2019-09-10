@@ -1,12 +1,11 @@
-import {app, BrowserWindow, ipcMain} from 'electron';
+import {app, BrowserWindow} from 'electron';
+import http from 'http';
+import getHtml from '../src/client/build/getHtml';
 
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
     app.quit();
 }
 
-// const server = express();
-
-let express_app;
 let mainWindow;
 
 const createWindow = () => {
@@ -38,13 +37,14 @@ app.on('activate', () => {
     }
 });
 
-// server.get('/', (req, res) => res.send('Hello World!'));
+const server = http.createServer((request, response) => {
+    const requestUrl = request.url;
 
-// ipcMain.on('start_server', (event, arg) => {
-//     express_app = server.listen(80, () => console.log('Example app listening on port 80!'));
-//     event.sender.send('server_is_started', 'server_is_started')
-// });
+    // PRODUCTION MODE
+    // if (requestUrl === '/') {
+    //     response.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
+    //     response.end(getHtml(), 'utf-8');
+    // }
+});
 
-// ipcMain.on('stop_server', (event, arg) => {
-//     express_app.close(() => event.sender.send('server_is_stopped', 'server_is_stopped'));
-// });
+server.listen(80);
