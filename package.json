@@ -54,6 +54,7 @@
     "react-dom": "^16.9.0"
   },
   "devDependencies": {
+    "babel-loader": "^7.1.5",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
@@ -63,6 +64,8 @@
     "eslint-config-airbnb": "^15.1.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jsx-a11y": "^5.1.1",
-    "eslint-plugin-react": "^7.14.3"
+    "eslint-plugin-react": "^7.14.3",
+    "webpack": "^4.39.3",
+    "webpack-cli": "^3.3.8"
   }
 }
