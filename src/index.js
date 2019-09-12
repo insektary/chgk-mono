@@ -1,4 +1,4 @@
-import {app, BrowserWindow} from 'electron';
+import {app, BrowserWindow, ipcMain} from 'electron';
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
@@ -72,6 +72,8 @@ const server = http.createServer((request, response) => {
 
     // DEVELOPMENT MODE
     fs.readFile(filePath, (error, content) => {
+        mainWindow.webContents.send('CONNECTION', 'test');
+
         if (error) {
             if (error.code === 'ENOENT') {
                 fs.readFile('./404.html', (e, c) => {
@@ -96,4 +98,18 @@ const server = http.createServer((request, response) => {
     // }
 });
 
-server.listen(80);
+ipcMain.on('SERVER', (event, {type}) => {
+    if (type === 'MODE_ON') {
+        server.listen(80, null, null, () => {
+            event.sender.send('SERVER', {message: 'server is running'});
+        });
+    } else if (type === 'MODE_OFF') {
+        server.close(() => {
+            event.sender.send('SERVER', {message: 'server is stopped'});
+        });
+    }
+});
+
+ipcMain.on('TEST', (event, payload) => {
+    event.sender.send('TEST', payload);
+});
