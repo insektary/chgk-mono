@@ -51,7 +51,8 @@
     "electron-squirrel-startup": "^1.0.0",
     "lodash": "^4.17.15",
     "react": "^16.9.0",
-    "react-dom": "^16.9.0"
+    "react-dom": "^16.9.0",
+    "ws": "^7.1.2"
   },
   "devDependencies": {
     "babel-loader": "^7.1.5",

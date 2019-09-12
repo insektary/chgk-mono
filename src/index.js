@@ -1,5 +1,6 @@
 import {app, BrowserWindow, ipcMain} from 'electron';
 import http from 'http';
+import WebSocket from 'ws';
 import fs from 'fs';
 import path from 'path';
 // import getHtml from '../src/client/build/getHtml'; //PRODUCTION MODE
@@ -96,6 +97,14 @@ const server = http.createServer((request, response) => {
     //     response.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
     //     response.end(getHtml(), 'utf-8');
     // }
+});
+
+const wss = new WebSocket.Server({port: 8080});
+
+wss.on('connection', (ws) => {
+    ws.on('message', (message) => {
+        console.log('received: %s', message);
+    });
 });
 
 ipcMain.on('SERVER', (event, {type}) => {
