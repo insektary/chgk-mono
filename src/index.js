@@ -1,8 +1,13 @@
 import {app, BrowserWindow, ipcMain} from 'electron';
+import {get} from 'lodash';
 import http from 'http';
 import WebSocket from 'ws';
 import fs from 'fs';
 import path from 'path';
+import {SERVER, CONNECTION, MESSAGES} from './app/constants/channels';
+import parseMessage from './app/utils/parse-message';
+import contentTypeDetector from './app/utils/content-type-detector';
+import {setIdMessage} from './app/api/ws-messages';
 // import getHtml from '../src/client/build/getHtml'; //PRODUCTION MODE
 
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -40,31 +45,6 @@ app.on('activate', () => {
     }
 });
 
-const contentTypeDetector = (extname) => {
-    switch (extname) {
-    case '.js':
-        return 'text/javascript';
-    case '.map':
-        return 'text/javascript';
-    case '.ico':
-        return 'image/x-icon';
-    case '.css':
-        return 'text/css';
-    case '.json':
-        return 'application/json';
-    case '.png':
-        return 'image/png';
-    case '.jpg':
-        return 'image/jpg';
-    case '.wav':
-        return 'audio/wav';
-    case '.svg':
-        return 'image/svg+xml';
-    default:
-        return 'text/html; charset=utf-8';
-    }
-};
-
 const server = http.createServer((request, response) => {
     const requestUrl = request.url;
     const extname = path.extname(requestUrl);
@@ -73,8 +53,6 @@ const server = http.createServer((request, response) => {
 
     // DEVELOPMENT MODE
     fs.readFile(filePath, (error, content) => {
-        mainWindow.webContents.send('CONNECTION', 'test');
-
         if (error) {
             if (error.code === 'ENOENT') {
                 fs.readFile('./404.html', (e, c) => {
@@ -99,26 +77,38 @@ const server = http.createServer((request, response) => {
     // }
 });
 
+let connections = [];
+
 const wss = new WebSocket.Server({port: 8080});
 
-wss.on('connection', (ws) => {
-    ws.on('message', (message) => {
-        console.log('received: %s', message);
-    });
+const recieveMessage = ws => (message) => {
+    const {type, payload} = parseMessage(message);
+
+    if (type === 'REGISTRATION') {
+        if (!connections.find(({id}) => id === get(payload, 'id'))) {
+            const newId = Date.now();
+            connections = [...connections, {id: newId}];
+
+            setIdMessage(ws, newId);
+        }
+    }
+};
+
+wss.on('connection', (ws, req) => {
+    connections.push(ws);
+    // ws.on('message', recieveMessage(ws));
+    console.log(wss.clients)
+    mainWindow.webContents.send(CONNECTION, '[th');
 });
 
-ipcMain.on('SERVER', (event, {type}) => {
-    if (type === 'MODE_ON') {
+ipcMain.on(SERVER, (event, {message}) => {
+    if (message === MESSAGES.MODE_ON) {
         server.listen(80, null, null, () => {
-            event.sender.send('SERVER', {message: 'server is running'});
+            event.sender.send(SERVER, {message: 'server is running'});
         });
-    } else if (type === 'MODE_OFF') {
+    } else if (message === MESSAGES.MODE_OFF) {
         server.close(() => {
-            event.sender.send('SERVER', {message: 'server is stopped'});
+            event.sender.send(SERVER, {message: 'server is stopped'});
         });
     }
-});
-
-ipcMain.on('TEST', (event, payload) => {
-    event.sender.send('TEST', payload);
 });

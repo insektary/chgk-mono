@@ -1,38 +1,43 @@
 import React, {PureComponent, Fragment} from 'react';
 import {ipcRenderer} from 'electron';
+import {SERVER, CONNECTION, MESSAGES} from '../constants/channels';
 import rootRequest from '../api/root-request';
 import getIp from '../utils/get-ip';
 
 class Page extends PureComponent {
     constructor() {
         super();
-        this.state = {serverIsRunning: false};
+        this.state = {
+            serverIsRunning: false,
+            connections: []
+        };
         this.startServer = this.startServer.bind(this);
         this.stopServer = this.stopServer.bind(this);
     }
 
     componentDidMount() {
-        ipcRenderer.on('CONNECTION', () => {
-            console.log('new connection');
+        ipcRenderer.on(CONNECTION, (event, connections) => {
+            // this.setState({connections});
+            console.log(connections)
         });
     }
 
     startServer() {
-        rootRequest('SERVER', {type: 'MODE_ON'})
+        rootRequest(SERVER, {message: MESSAGES.MODE_ON})
             .then(() => {
                 this.setState({serverIsRunning: true});
             });
     }
 
     stopServer() {
-        rootRequest('SERVER', {type: 'MODE_OFF'})
+        rootRequest(SERVER, {message: MESSAGES.MODE_OFF})
             .then(() => {
                 this.setState({serverIsRunning: false});
             });
     }
 
     render() {
-        const {serverIsRunning} = this.state;
+        const {serverIsRunning, connections} = this.state;
 
         return (
             <Fragment>
@@ -40,6 +45,7 @@ class Page extends PureComponent {
                 <div>{serverIsRunning ? 'RUN' : 'STOPPED'}</div>
                 <button onClick={this.startServer}>start server</button>
                 <button onClick={this.stopServer}>stop server</button>
+                {connections.filter(({readyState}) => readyState === 1).map((connection) => <div>client</div>)}
             </Fragment>
         );
     }
