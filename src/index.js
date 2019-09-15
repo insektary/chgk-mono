@@ -7,7 +7,9 @@ import path from 'path';
 import {SERVER, CONNECTION, MESSAGES} from './app/constants/channels';
 import parseMessage from './app/utils/parse-message';
 import contentTypeDetector from './app/utils/content-type-detector';
+import addPropToClient from './app/utils/add-prop-to-client';
 import {setIdMessage} from './app/api/ws-messages';
+import {sendConnectionsToRender} from './app/api/render-request';
 // import getHtml from '../src/client/build/getHtml'; //PRODUCTION MODE
 
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -77,8 +79,6 @@ const server = http.createServer((request, response) => {
     // }
 });
 
-let connections = [];
-
 const wss = new WebSocket.Server({port: 8080});
 
 const recieveMessage = ws => (message) => {
@@ -94,21 +94,27 @@ const recieveMessage = ws => (message) => {
     }
 };
 
-wss.on('connection', (ws, req) => {
-    connections.push(ws);
+wss.on('connection', (client, req) => {
     // ws.on('message', recieveMessage(ws));
-    console.log(wss.clients)
-    mainWindow.webContents.send(CONNECTION, '[th');
+
+    addPropToClient({
+        wss,
+        client,
+        prop: 'tempId',
+        value: Math.random()
+    });
+
+    sendConnectionsToRender(mainWindow, wss.clients);
+
+    client.on('close', () => sendConnectionsToRender(mainWindow, wss.clients));
 });
 
 ipcMain.on(SERVER, (event, {message}) => {
     if (message === MESSAGES.MODE_ON) {
-        server.listen(80, null, null, () => {
-            event.sender.send(SERVER, {message: 'server is running'});
-        });
+        server.listen(80, null, null, () => event.sender.send(SERVER, {message: 'server is running'}));
     } else if (message === MESSAGES.MODE_OFF) {
-        server.close(() => {
-            event.sender.send(SERVER, {message: 'server is stopped'});
-        });
+        server.close(() => event.sender.send(SERVER, {message: 'server is stopped'}));
     }
 });
+
+ipcMain.on('SEND_TO_CLIENTS', (event, {message}) => wss.clients.forEach(client => client.send(message)));

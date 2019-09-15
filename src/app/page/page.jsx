@@ -11,29 +11,27 @@ class Page extends PureComponent {
             serverIsRunning: false,
             connections: []
         };
+        this.sendBroadcast = this.sendBroadcast.bind(this);
         this.startServer = this.startServer.bind(this);
         this.stopServer = this.stopServer.bind(this);
     }
 
     componentDidMount() {
-        ipcRenderer.on(CONNECTION, (event, connections) => {
-            // this.setState({connections});
-            console.log(connections)
-        });
+        ipcRenderer.on(CONNECTION, (event, connections) => this.setState({connections}));
     }
 
     startServer() {
         rootRequest(SERVER, {message: MESSAGES.MODE_ON})
-            .then(() => {
-                this.setState({serverIsRunning: true});
-            });
+            .then(() => this.setState({serverIsRunning: true}));
+    }
+
+    sendBroadcast() {
+        rootRequest('SEND_TO_CLIENTS', {message: 'всем хуй!'});
     }
 
     stopServer() {
         rootRequest(SERVER, {message: MESSAGES.MODE_OFF})
-            .then(() => {
-                this.setState({serverIsRunning: false});
-            });
+            .then(() => this.setState({serverIsRunning: false}));
     }
 
     render() {
@@ -45,7 +43,8 @@ class Page extends PureComponent {
                 <div>{serverIsRunning ? 'RUN' : 'STOPPED'}</div>
                 <button onClick={this.startServer}>start server</button>
                 <button onClick={this.stopServer}>stop server</button>
-                {connections.filter(({readyState}) => readyState === 1).map((connection) => <div>client</div>)}
+                <button onClick={this.sendBroadcast}>Отправить всем</button>
+                {connections.map(({tempId}) => <div>{`client ${tempId}`}</div>)}
             </Fragment>
         );
     }
