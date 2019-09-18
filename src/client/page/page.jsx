@@ -4,6 +4,7 @@ import RegistrationForm from './registration-form/registration-form';
 class Page extends PureComponent {
     constructor() {
         super();
+        this.signIn = this.signIn.bind(this);
         this.sendData = this.sendData.bind(this);
         this.state = {
             connectionIsActive: false,
@@ -18,8 +19,6 @@ class Page extends PureComponent {
 
         this.socket.onopen = () => {
             this.setState({connectionIsActive: true});
-
-            this.sendData({type: 'REGISTRATION', payload: {id}});
         };
 
         this.socket.onclose = () => {
@@ -39,6 +38,10 @@ class Page extends PureComponent {
         this.socket.send(JSON.stringify(data));
     }
 
+    signIn(formValues) {
+        this.sendData({type: 'REGISTRATION', payload: {formValues}});
+    }
+
     render() {
         const {connectionIsActive} = this.state;
 
@@ -46,7 +49,7 @@ class Page extends PureComponent {
             <Fragment>
                 <div>{connectionIsActive ? 'Подключено' : 'Отключено'}</div>
                 <button onClick={this.sendData}>Отправить сообщение</button>
-                <RegistrationForm />
+                <RegistrationForm signIn={this.signIn} />
             </Fragment>
         );
     }

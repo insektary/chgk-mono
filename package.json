@@ -5,11 +5,12 @@
   "description": "My Electron application description",
   "main": "src/index.js",
   "scripts": {
-    "start": "electron-forge start",
+    "start": "webpack && electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint src --color"
+    "lint": "eslint src --color",
+    "build": "webpack"
   },
   "keywords": [],
   "author": "Maxim_Dashkov",
@@ -57,6 +58,7 @@
   "devDependencies": {
     "babel-loader": "^7.1.5",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
