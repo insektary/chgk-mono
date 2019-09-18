@@ -1,4 +1,5 @@
 import React, {PureComponent, Fragment} from 'react';
+import RegistrationForm from './registration-form/registration-form';
 
 class Page extends PureComponent {
     constructor() {
@@ -45,6 +46,7 @@ class Page extends PureComponent {
             <Fragment>
                 <div>{connectionIsActive ? 'Подключено' : 'Отключено'}</div>
                 <button onClick={this.sendData}>Отправить сообщение</button>
+                <RegistrationForm />
             </Fragment>
         );
     }
