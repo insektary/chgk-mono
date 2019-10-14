@@ -1,6 +1,7 @@
 import React, {PureComponent, Fragment} from 'react';
 import {ipcRenderer} from 'electron';
 import {SERVER, CONNECTION, MESSAGES} from '../constants/channels';
+import FileInspector from './file-inspector/file-inspector';
 import rootRequest from '../api/root-request';
 import getIp from '../utils/get-ip';
 
@@ -45,6 +46,7 @@ class Page extends PureComponent {
                 <button onClick={this.stopServer}>stop server</button>
                 <button onClick={this.sendBroadcast}>Отправить всем</button>
                 {connections.map(({tempId}) => <div>{`client ${tempId}`}</div>)}
+                <FileInspector />
             </Fragment>
         );
     }

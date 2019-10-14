@@ -6,6 +6,8 @@
     "indent": ["error", 4],
     "react/jsx-indent": ["error", 4],
     "react/jsx-indent-props": ["error", 4],
+    "react/no-did-mount-set-state": 0,
+    "class-methods-use-this": 0,
     "import/extensions": 0,
     "import/no-extraneous-dependencies": 0,
     "import/no-unresolved": [2, { "ignore": ["electron"] }],

@@ -20,8 +20,8 @@ let mainWindow;
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1400,
+        height: 1000,
     });
 
     mainWindow.loadURL(`file://${__dirname}/app/index.html`);
