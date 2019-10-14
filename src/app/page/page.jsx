@@ -46,7 +46,7 @@ class Page extends PureComponent {
                 <button onClick={this.stopServer}>stop server</button>
                 <button onClick={this.sendBroadcast}>Отправить всем</button>
                 {connections.map(({tempId}) => <div>{`client ${tempId}`}</div>)}
-                <FileInspector />
+                <FileInspector onSelect={res => console.log(res)} />
             </Fragment>
         );
     }

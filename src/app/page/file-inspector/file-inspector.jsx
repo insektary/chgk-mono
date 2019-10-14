@@ -1,29 +1,10 @@
 import React, {PureComponent, Fragment} from 'react';
 import PropTypes from 'prop-types';
 import path from 'path';
-import fs from 'fs';
+import readFolder from '../../api/read-folder';
+import getStat from '../../api/get-stat';
 
 const DEFAULT_PATH = './';
-
-const readFolder = fullPath => new Promise((res, rej) => {
-    fs.readdir(fullPath, (err, data) => {
-        if (err) {
-            rej();
-        } else {
-            res(data);
-        }
-    });
-});
-
-const getStat = fullPath => new Promise((res, rej) => {
-    fs.stat(fullPath, (err, data) => {
-        if (err) {
-            rej();
-        } else {
-            res(data);
-        }
-    });
-});
 
 class FileInspector extends PureComponent {
     constructor() {
@@ -98,7 +79,12 @@ class FileInspector extends PureComponent {
             <Fragment>
                 <button onClick={this.goUpper}>УП</button>
                 <div>{currentPath.join('/')}</div>
-                {files.map(item => <div onDoubleClick={() => this.onSelect(item)} style={{cursor: 'pointer'}} key={item}>{item}</div>)}
+                {files.map(({name, isDirectory}) => (
+                    <div onDoubleClick={() => this.onSelect(name)} style={{cursor: 'pointer'}} key={name}>
+                        {isDirectory && <span>&#128194;</span>}
+                        <span>{name}</span>
+                    </div>
+                ))}
             </Fragment>
         );
     }
