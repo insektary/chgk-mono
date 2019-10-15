@@ -44,7 +44,8 @@ class FileInspector extends PureComponent {
                         .then(files => this.setState({
                             files,
                             currentPath: fullPath.split('/')
-                        }));
+                        }))
+                        .catch(this.handleReadError);
                 }
             })
             .catch(this.handleReadError);
@@ -54,8 +55,8 @@ class FileInspector extends PureComponent {
         this.setState({files: results});
     }
 
-    handleReadError() {
-        console.log('Ошибка при чтении');
+    handleReadError(err) {
+        console.log(err);
     }
 
     goUpper() {

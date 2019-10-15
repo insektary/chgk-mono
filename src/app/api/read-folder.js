@@ -4,7 +4,7 @@ import getStat from './get-stat';
 const readFolder = fullPath => new Promise((res, rej) => {
     fs.readdir(fullPath, (err, data) => {
         if (err) {
-            rej();
+            rej(err);
         } else {
             Promise.all(data.map(path => new Promise((resolve) => {
                 getStat(`${fullPath}\\${path}`)
